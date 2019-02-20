@@ -1,0 +1,14 @@
+single-run:
+    name: examples
+    files:
+    - examples/*.yml
+
+#plugins:
+#- enqueuer-plugin-sqs
+
+store:
+    awsConfiguration:
+        endpoint: http://localhost:9324
+        accessKeyId: na
+        secretAccessKey: na
+        region: us-west-2

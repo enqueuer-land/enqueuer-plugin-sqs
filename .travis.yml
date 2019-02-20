@@ -1,0 +1,29 @@
+language: node_js
+
+sudo: required
+
+node_js:
+- v10.8.0
+
+cache:
+    directories:
+    - node_modules
+
+notifications:
+    email:
+        recipients:
+        - guilherme.moraes@outlook.com
+        on_success: never
+        on_failure: always
+
+
+before_install:
+- wget -O temp/elasticmq-server-0.13.11.jar https://s3-eu-west-1.amazonaws.com/softwaremill-public/elasticmq-server-0.13.11.jar
+- java -Dconfig.file=conf/elasticMq.conf -jar temp/elasticmq-server-0.13.11.jar &
+
+script:
+- npm install
+- npm run lint
+- npm run build
+- npm link
+- nqr -a examples/sqs.yml -l /home/travis/build/lopidio/enqueuer-plugin-sqs conf/nqr.yml
