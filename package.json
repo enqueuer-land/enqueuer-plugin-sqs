@@ -35,6 +35,6 @@
   },
   "dependencies": {
     "enqueuer-plugins-template": "^1.0.4",
-    "aws-sdk": "^2.386.0"
+    "aws-sdk": "^2.410.0"
   }
 }
