@@ -5,15 +5,16 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "all": "npm run clean && npm run lint && npm run build",
+    "all": "npm run clean && npm run lint && npm run build && npm run test",
     "build": "tsc",
+    "test": "nqr -a examples/sqs.yml -l `pwd` conf/nqr.yml",
     "clean": "rm -rf dist",
     "lint": "node_modules/.bin/tslint --project tsconfig.json",
     "prepublishOnly": "npm run all"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lopidio/enqueuer-plugin-sqs.git"
+    "url": "git+https://github.com/enqueuer-land/enqueuer-plugin-sqs.git"
   },
   "keywords": [
     "enqueuer",
@@ -24,17 +25,17 @@
   "author": "Virgs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lopidio/enqueuer-plugin-sqs/issues"
+    "url": "https://github.com/enqueuer-land/enqueuer-plugin-sqs/issues"
   },
-  "homepage": "https://github.com/lopidio/enqueuer-plugin-sqs#readme",
+  "homepage": "https://github.com/enqueuer-land/enqueuer-plugin-sqs#readme",
   "devDependencies": {
-    "@types/node": "^11.9.4",
+    "@types/node": "^11.9.5",
     "ts-node": "^8.0.2",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.1"
+    "tslint": "^5.13.0",
+    "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "enqueuer-plugins-template": "^1.0.4",
-    "aws-sdk": "^2.410.0"
+    "aws-sdk": "^2.411.0",
+    "enqueuer-plugins-template": "^1.0.7"
   }
 }

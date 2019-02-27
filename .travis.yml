@@ -26,4 +26,4 @@ script:
 - npm run lint
 - npm run build
 - npm link
-- nqr -a examples/sqs.yml -l /home/travis/build/lopidio/enqueuer-plugin-sqs conf/nqr.yml
+- npm run test
