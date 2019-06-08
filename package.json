@@ -1,6 +1,6 @@
 {
   "name": "enqueuer-plugin-sqs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Enqueuer sqs plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
