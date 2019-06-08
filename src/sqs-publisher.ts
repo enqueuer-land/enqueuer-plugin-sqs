@@ -1,4 +1,4 @@
-import {Logger, MainInstance, Publisher, PublisherModel, PublisherProtocol} from 'enqueuer-plugins-template';
+import {Logger, MainInstance, Publisher, InputPublisherModel, PublisherProtocol} from 'enqueuer';
 import * as AWS from 'aws-sdk';
 import {SendMessageRequest, SendMessageResult} from 'aws-sdk/clients/sqs';
 
@@ -7,7 +7,7 @@ export class SqsPublisher extends Publisher {
     private sqsSend: AWS.SQS;
     private params: SendMessageRequest;
 
-    public constructor(publisherProperties: PublisherModel) {
+    public constructor(publisherProperties: InputPublisherModel) {
         super(publisherProperties);
 
         this.sqsSend = new AWS.SQS(publisherProperties.awsConfiguration);
@@ -21,8 +21,8 @@ export class SqsPublisher extends Publisher {
                 if (err) {
                     return reject(`Error publishing to SQS: ${err}`);
                 } else {
-                    this.messageReceived = data;
                     Logger.trace(`SQS send message result: ${JSON.stringify(data)}`);
+                    this.executeHookEvent('onPublished', data);
                     return resolve();
                 }
             });
@@ -33,8 +33,8 @@ export class SqsPublisher extends Publisher {
 
 export function entryPoint(mainInstance: MainInstance): void {
     const sqs = new PublisherProtocol('sqs',
-        (publisherModel: PublisherModel) => new SqsPublisher(publisherModel),
-        ['ResponseMetadata', 'MD5OfMessageBody', 'MD5OfMessageAttributes', 'MessageId'])
+        (publisherModel: InputPublisherModel) => new SqsPublisher(publisherModel),
+        {onPublished: ['ResponseMetadata', 'MD5OfMessageBody', 'MD5OfMessageAttributes', 'MessageId']})
         .setLibrary('aws-sdk');
     mainInstance.protocolManager.addProtocol(sqs);
 }

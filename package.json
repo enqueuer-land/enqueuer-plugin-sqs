@@ -7,7 +7,7 @@
   "scripts": {
     "all": "npm run clean && npm run lint && npm run build && npm run test",
     "build": "tsc",
-    "test": "nqr -a examples/sqs.yml -l `pwd` conf/nqr.yml",
+    "test": "nqr -l `pwd` -c conf/nqr.yml",
     "clean": "rm -rf dist",
     "lint": "node_modules/.bin/tslint --project tsconfig.json",
     "prepublishOnly": "npm run all"
@@ -36,6 +36,6 @@
   },
   "dependencies": {
     "aws-sdk": "^2.411.0",
-    "enqueuer-plugins-template": "^1.0.7"
+    "enqueuer": "^4.7.6"
   }
 }

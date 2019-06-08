@@ -1,10 +1,5 @@
-single-run:
-    name: examples
-    files:
+files:
     - examples/*.yml
-
-#plugins:
-#- enqueuer-plugin-sqs
 
 store:
     awsConfiguration:

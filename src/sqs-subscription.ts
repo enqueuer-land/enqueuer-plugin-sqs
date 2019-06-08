@@ -1,4 +1,4 @@
-import {Logger, MainInstance, Subscription, SubscriptionModel, SubscriptionProtocol} from 'enqueuer-plugins-template';
+import {Logger, MainInstance, Subscription, InputSubscriptionModel, SubscriptionProtocol} from 'enqueuer';
 import * as AWS from 'aws-sdk';
 import {ReceiveMessageResult} from 'aws-sdk/clients/sqs';
 
@@ -6,7 +6,7 @@ export class SqsSubscription extends Subscription {
 
     private sqs: AWS.SQS;
 
-    constructor(subscriptionModel: SubscriptionModel) {
+    constructor(subscriptionModel: InputSubscriptionModel) {
         super(subscriptionModel);
 
         this.sqs = new AWS.SQS(subscriptionModel.awsConfiguration);
@@ -32,10 +32,11 @@ export class SqsSubscription extends Subscription {
     }
 
 }
+
 export function entryPoint(mainInstance: MainInstance): void {
     const sqs = new SubscriptionProtocol('sqs',
-        (subscriptionModel: SubscriptionModel) => new SqsSubscription(subscriptionModel),
-        ['Body', 'MessageId', 'ReceiptHandle', 'MD5OfBody'])
+        (subscriptionModel: InputSubscriptionModel) => new SqsSubscription(subscriptionModel),
+        {onMessageReceived: ['Body', 'MessageId', 'ReceiptHandle', 'MD5OfBody']})
         .setLibrary('aws-sdk');
     mainInstance.protocolManager.addProtocol(sqs);
 }
