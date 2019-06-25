@@ -37,3 +37,7 @@ subscriptions:
                     expectToBeDefined: ReceiptHandle
                 -   name: MD5OfBody
                     expectToBeDefined: MD5OfBody
+        onSubscribed:
+            assertions:
+                - expectToBeTruthy: true
+
