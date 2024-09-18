@@ -36,6 +36,6 @@
   },
   "dependencies": {
     "aws-sdk": "^2.482.0",
-    "enqueuer": "^5.0.0"
+    "enqueuer": "^6.0.0"
   }
 }
