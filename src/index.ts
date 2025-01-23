@@ -1,8 +1,8 @@
-import * as subscription from './sqs-subscription';
-import * as publisher from './sqs-publisher';
-import {MainInstance} from 'enqueuer';
+import * as sensor from "./sqs-sensor";
+import * as actuator from "./sqs-actuator";
+import { MainInstance } from "enqueuer";
 
 export function entryPoint(mainInstance: MainInstance): void {
-    subscription.entryPoint(mainInstance);
-    publisher.entryPoint(mainInstance);
+  sensor.entryPoint(mainInstance);
+  actuator.entryPoint(mainInstance);
 }

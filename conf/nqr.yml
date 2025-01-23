@@ -1,9 +1,9 @@
 files:
-    - examples/*.yml
+  - examples/*.yml
 
 store:
-    awsConfiguration:
-        endpoint: http://localhost:9324
-        accessKeyId: na
-        secretAccessKey: na
-        region: us-west-2
+  awsConfiguration:
+    endpoint: http://localhost:4566
+    accessKeyId: na
+    secretAccessKey: na
+    region: us-east-1

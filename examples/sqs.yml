@@ -1,43 +1,84 @@
-name: requisition description
-publishers:
-    -   name: publisher description
-        type: sqs
-        payload: enqueuer
-        awsConfiguration: <<awsConfiguration>>
-        messageParams:
-            QueueUrl: http://localhost:9324/queue/enqueuerQueue
-        onPublished:
-            assertions:
-                -   name: Request Id is all 000000
-                    expect: ResponseMetadata.RequestId
-                    toBeEqualTo: `00000000-0000-0000-0000-000000000000`
-                -   name: ResponseMetadata
-                    expectToBeDefined: ResponseMetadata
-                -   name: MD5
-                    expectToBeDefined: MD5OfMessageBody
-                -   name: MD5OfMessageAttributes
-                    expectToBeDefined: MD5OfMessageAttributes
-                -   name: MessageId
-                    expectToBeDefined: MessageId
-subscriptions:
-    -   name: subscription description
-        type: sqs
-        awsConfiguration: <<awsConfiguration>>
-        messageParams:
-            QueueUrl: http://localhost:9324/queue/enqueuerQueue
-        timeout: 3000
-        onMessageReceived:
-            assertions:
-                -   name: Body
-                    expect: Body
-                    toContain: `enq`
-                -   name: MessageId
-                    expectToBeDefined: MessageId
-                -   name: ReceiptHandle
-                    expectToBeDefined: ReceiptHandle
-                -   name: MD5OfBody
-                    expectToBeDefined: MD5OfBody
-        onSubscribed:
-            assertions:
-                - expectToBeTruthy: true
-
+name: SQS test task
+actuators:
+  - name: actuator description
+    type: sqs
+    payload: enqueuer
+    awsConfiguration: <<awsConfiguration>>
+    messageParams:
+      QueueUrl: http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/store-hours-changes-queue
+    onPublished:
+      assertions:
+        - name: Request Id is all 000000
+          expect: $metadata.httpStatusCode
+          toBeEqualTo: 200
+        - name: Request Id is all 000000
+          expectToBeDefined: $metadata
+        - name: MD5
+          expectToBeDefined: MD5OfMessageBody
+        - name: MD5OfMessageBody
+          expectToBeDefined: MD5OfMessageBody
+        - name: MessageId
+          expectToBeDefined: MessageId
+sensors:
+  - name: sensor description
+    type: sqs
+    awsConfiguration: <<awsConfiguration>>
+    messageParams:
+      #required
+      QueueUrl: http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/store-hours-changes-queue
+      #optionals
+      AttributeNames:
+        - All
+        # - Policy
+        # - VisibilityTimeout
+        # - MaximumMessageSize
+        # - MessageRetentionPeriod
+        # - ApproximateNumberOfMessages
+        # - ApproximateNumberOfMessagesNotVisible
+        # - CreatedTimestamp
+        # - LastModifiedTimestamp
+        # - QueueArn
+        # - ApproximateNumberOfMessagesDelayed
+        # - DelaySeconds
+        # - ReceiveMessageWaitTimeSeconds
+        # - RedrivePolicy
+        # - FifoQueue
+        # - ContentBasedDeduplication
+        # - KmsMasterKeyId
+        # - KmsDataKeyReusePeriodSeconds
+        # - DeduplicationScope
+        # - FifoThroughputLimit
+        # - RedriveAllowPolicy
+        # - SqsManagedSseEnabled
+      MessageSystemAttributeNames:
+        - All
+        # - SenderId
+        # - SentTimestamp
+        # - ApproximateReceiveCount
+        # - ApproximateFirstReceiveTimestamp
+        # - SequenceNumber
+        # - MessageDeduplicationId
+        # - MessageGroupId
+        # - AWSTraceHeader
+        # - DeadLetterQueueSourceArn
+      MessageAttributeNames: ["All"]
+      MaxNumberOfMessages: 1
+      VisibilityTimeout: 10
+      WaitTimeSeconds: 10
+    onMessageReceived:
+      assertions:
+        - expect: Body
+          toContain: "'enq'"
+        - expectToBeDefined: Attributes.SenderId
+        - expectToBeDefined: Attributes.SentTimestamp
+        - expectToBeDefined: Attributes.ApproximateReceiveCount
+        - expectToBeDefined: Attributes.ApproximateReceiveCount
+        - name: MD5OfBody
+          expectToBeDefined: MD5OfBody
+        - name: MessageId
+          expectToBeDefined: MessageId
+        - name: ReceiptHandle
+          expectToBeDefined: ReceiptHandle
+    onSubscribed:
+      assertions:
+        - expectToBeTruthy: true
