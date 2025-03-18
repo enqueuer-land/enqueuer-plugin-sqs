@@ -30,7 +30,7 @@
   "homepage": "https://github.com/enqueuer-land/enqueuer-plugin-sqs#readme",
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.734.0",
-    "enqueuer": "^6.0.2"
+    "enqueuer": "^6.0.3"
   },
   "devDependencies": {
     "@types/node": "^22.10.10",

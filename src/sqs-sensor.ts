@@ -1,20 +1,17 @@
 import { ReceiveMessageCommandOutput, SQS } from "@aws-sdk/client-sqs";
 import {
   InputSensorModel,
+  Logger,
   MainInstance,
   Sensor,
   SensorProtocol,
 } from "enqueuer";
 
 export class SqsSensor extends Sensor {
-  private sqs: SQS;
-
   constructor(properties: InputSensorModel) {
     properties.timeout =
       properties.messageParams?.WaitTimeSeconds * 1000 || properties.timeout;
     super(properties);
-
-    this.sqs = new SQS(properties.awsConfiguration);
   }
 
   public async receiveMessage(): Promise<void> {
@@ -24,11 +21,18 @@ export class SqsSensor extends Sensor {
       );
       this.executeHookEvent("onMessageReceived", output.Messages![0]);
     } catch (err) {
-      this.executeHookEvent("onError", err);
+      let errMessage = err;
+      if (err instanceof Error && "errors" in err) {
+        errMessage = err.errors;
+      }
+
+      Logger.error(`Error receiving message from SQS: '${errMessage}'`);
+      throw err;
     }
   }
 
   public async mount(): Promise<void> {
+    this.sqs = new SQS(this.awsConfiguration);
     this.executeHookEvent("onSubscribed");
   }
 }
