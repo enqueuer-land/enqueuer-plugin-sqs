@@ -24,6 +24,15 @@ export class SqsActuator extends Actuator {
   public async act(): Promise<void> {
     try {
       const sqsSend = new SQS(this.awsConfiguration);
+      if (this.purgeBeforeSend) {
+        Logger.trace(
+          `Purging SQS queue: ${this.awsConfiguration.endpoint}/${this.awsConfiguration.queueUrl}`
+        );
+        await sqsSend.purgeQueue({
+          QueueUrl: this.messageParams.QueueUrl,
+        });
+        Logger.trace("SQS queue purged successfully.");
+      }
 
       const data: SendMessageCommandOutput = await sqsSend.sendMessage(
         this.messageParams
@@ -53,6 +62,11 @@ export function entryPoint(mainInstance: MainInstance): void {
         attributes: {
           payload: {
             type: "any",
+          },
+          purgeBeforeSend: {
+            type: "boolean",
+            description:
+              "If true, the SQS queue will be purged before the message is sent.",
           },
           awsConfiguration: {
             type: {
