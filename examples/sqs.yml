@@ -2,7 +2,9 @@ name: SQS test task
 actuators:
   - name: actuator description
     type: sqs
-    payload: enqueuer
+    payload:
+      object:
+        enq: "test"
     awsConfiguration: <<awsConfiguration>>
     purgeBeforeSend: true
     onInit:

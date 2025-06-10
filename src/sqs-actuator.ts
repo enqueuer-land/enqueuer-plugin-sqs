@@ -18,7 +18,10 @@ export class SqsActuator extends Actuator {
     super(properties);
 
     this.params = properties.messageParams || {};
-    this.params.MessageBody = properties.payload;
+    this.params.MessageBody =
+      typeof properties.payload === "string"
+        ? properties.payload
+        : JSON.stringify(properties.payload);
   }
 
   public async act(): Promise<void> {
