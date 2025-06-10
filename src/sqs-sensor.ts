@@ -27,13 +27,26 @@ export class SqsSensor extends Sensor {
       const message = output.Messages![0];
       this.executeHookEvent("onMessageReceived", message);
 
-      if (this.deleteMessage) {
-        const deleteMessageCommand = new DeleteMessageCommand({
+      if (this.deleteMessageAfterReceive) {
+        Logger.trace(
+          `Deleting message from SQS queue: ${this.awsConfiguration.endpoint}/${this.messageParams.QueueUrl}`
+        );
+        const deletionResponse = this.sqs!.deleteMessage({
           QueueUrl: this.messageParams.QueueUrl,
           ReceiptHandle: message.ReceiptHandle,
         });
-        const response = await this.sqs!.send(deleteMessageCommand);
-        this.executeHookEvent("onMessageDeleted", response);
+        this.executeHookEvent("onMessageDeleted", deletionResponse);
+        Logger.trace(
+          `Message deleted successfully from SQS queue: ${this.awsConfiguration.endpoint}/${this.messageParams.QueueUrl}`
+        );
+      }
+      if (this.purgeQueueAfterReceive) {
+        Logger.trace(
+          `Purging SQS queue: ${this.awsConfiguration.endpoint}/${this.messageParams.QueueUrl}`
+        );
+        await this.sqs!.purgeQueue({ QueueUrl: this.messageParams.QueueUrl });
+        this.executeHookEvent("onQueuePurged");
+        Logger.trace("SQS queue purged successfully.");
       }
     } catch (err) {
       let errMessage = err;
@@ -80,6 +93,16 @@ export function entryPoint(mainInstance: MainInstance): void {
                 type: "string",
               },
             },
+          },
+          deleteMessageAfterReceive: {
+            type: "boolean",
+            description:
+              "If true, the message will be deleted after being read from the queue.",
+          },
+          purgeQueueAfterReceive: {
+            type: "boolean",
+            description:
+              "If true, the SQS queue will be purged after the message is received.",
           },
         },
         hooks: {

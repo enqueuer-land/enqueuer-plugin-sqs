@@ -29,7 +29,8 @@ sensors:
   - name: sensor description
     type: sqs
     awsConfiguration: <<awsConfiguration>>
-    deleteMessage: true
+    deleteMessageAfterReceive: true
+    purgeQueueAfterReceive: true
     messageParams:
       #required
       QueueUrl: http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/location-menu-availability-queue.fifo
@@ -86,6 +87,9 @@ sensors:
           expectToBeDefined: MessageId
         - name: ReceiptHandle
           expectToBeDefined: ReceiptHandle
+    onQueuePurged:
+      assertions:
+        - expectToBeTruthy: true
     onMessageDeleted:
       assertions:
         - expectToBeTruthy: true
