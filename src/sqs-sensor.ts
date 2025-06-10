@@ -1,4 +1,8 @@
-import { ReceiveMessageCommandOutput, SQS } from "@aws-sdk/client-sqs";
+import {
+  ReceiveMessageCommandOutput,
+  DeleteMessageCommand,
+  SQS,
+} from "@aws-sdk/client-sqs";
 import {
   InputSensorModel,
   Logger,
@@ -8,6 +12,8 @@ import {
 } from "enqueuer";
 
 export class SqsSensor extends Sensor {
+  private sqs?: SQS;
+
   constructor(properties: InputSensorModel) {
     properties.timeout =
       properties.messageParams?.WaitTimeSeconds * 1000 || properties.timeout;
@@ -16,17 +22,26 @@ export class SqsSensor extends Sensor {
 
   public async receiveMessage(): Promise<void> {
     try {
-      const output: ReceiveMessageCommandOutput = await this.sqs.receiveMessage(
-        this.messageParams
-      );
-      this.executeHookEvent("onMessageReceived", output.Messages![0]);
+      const output: ReceiveMessageCommandOutput =
+        await this.sqs!.receiveMessage(this.messageParams);
+      const message = output.Messages![0];
+      this.executeHookEvent("onMessageReceived", message);
+
+      if (this.deleteMessage) {
+        const deleteMessageCommand = new DeleteMessageCommand({
+          QueueUrl: this.messageParams.QueueUrl,
+          ReceiptHandle: message.ReceiptHandle,
+        });
+        const response = await this.sqs!.send(deleteMessageCommand);
+        this.executeHookEvent("onMessageDeleted", response);
+      }
     } catch (err) {
       let errMessage = err;
       if (err instanceof Error && "errors" in err) {
         errMessage = err.errors;
       }
 
-      Logger.error(`Error receiving message from SQS: '${errMessage}'`);
+      Logger.error(`Error executing SQS command: '${errMessage}'`);
       throw err;
     }
   }
@@ -71,6 +86,11 @@ export function entryPoint(mainInstance: MainInstance): void {
           onSubscribed: {
             arguments: {},
             description: "Executed when subscription was subscribed.",
+          },
+          onMessageDeleted: {
+            arguments: {},
+            description:
+              "Executed when and if a message is deleted after reading it.",
           },
           onMessageReceived: {
             description: "Executed when message was published correctly.",

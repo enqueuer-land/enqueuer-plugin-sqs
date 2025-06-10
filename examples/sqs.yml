@@ -4,8 +4,13 @@ actuators:
     type: sqs
     payload: enqueuer
     awsConfiguration: <<awsConfiguration>>
+    onInit:
+      script: |
+        this.messageParams.MessageGroupId = Math.random().toString(36).substring(2, 15);
     messageParams:
-      QueueUrl: http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/store-hours-changes-queue
+      QueueUrl: http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/store-hours-changes-queue.fifo
+      MessageGroupId: group1
+      MessageDeduplicationId: dedup1
     onPublished:
       assertions:
         - name: Request Id is all 000000
@@ -23,9 +28,10 @@ sensors:
   - name: sensor description
     type: sqs
     awsConfiguration: <<awsConfiguration>>
+    deleteMessage: true
     messageParams:
       #required
-      QueueUrl: http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/store-hours-changes-queue
+      QueueUrl: http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/store-hours-changes-queue.fifo
       #optionals
       AttributeNames:
         - All
@@ -79,6 +85,9 @@ sensors:
           expectToBeDefined: MessageId
         - name: ReceiptHandle
           expectToBeDefined: ReceiptHandle
+    onMessageDeleted:
+      assertions:
+        - expectToBeTruthy: true
     onSubscribed:
       assertions:
         - expectToBeTruthy: true

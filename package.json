@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/enqueuer-land/enqueuer-plugin-sqs#readme",
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.734.0",
+    "@aws-sdk/client-sqs": "^3.826.0",
     "enqueuer": "^6.0.3"
   },
   "devDependencies": {
